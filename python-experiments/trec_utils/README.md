@@ -9,3 +9,5 @@ Place your **config.json** file here with the following information:
   "TRIALS" : "/trials-index"
 }
 ```
+
+Note: this config.json file has been added to .gitignore to prevent the accidental exposure of an elasticsearch server
