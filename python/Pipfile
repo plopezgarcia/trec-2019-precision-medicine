@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+jupyter = "*"
+ipykernel = "*"
+ipython = "*"
+json2html = "*"
+pandas = "*"
+pytrec-eval = "*"
+sklearn = "*"
+requests = "*"
+
+[requires]
+python_version = "3.6"
