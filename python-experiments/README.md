@@ -3,8 +3,8 @@ Place a **config.json** file under [trec_utils](https://github.com/plopezgarcia/
 ```json
 {
   "ELASTIC" : "http://your-elasticsearch-server:9200",
-  "ABSTRACTS" : "/abstracts-index",
-  "TRIALS" : "/trials-index"
+  "ABSTRACTS" : "/abstracts",
+  "TRIALS" : "/trials"
 }
 ```
 
