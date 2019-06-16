@@ -11,9 +11,10 @@ ipykernel = "*"
 ipython = "*"
 json2html = "*"
 pandas = "*"
-pytrec-eval = "*"
 sklearn = "*"
 requests = "*"
+pytrec-eval = "*"
+jupyterlab = "*"
 
 [requires]
 python_version = "3.6"

@@ -117,3 +117,6 @@ def to_trec_run_file(run_df, run_params):
     run_df[['TOPIC_NO','Q0','ID','RANK','SCORE','RUN_NAME']].to_csv('submitted_runs/'+run_params['run_id'], \
                                                                     sep=' ', encoding='utf-8', \
                                                                     header=False, index=False)
+def from_trec_run_file(trec_eval_file):
+    return(pandas.read_csv(trec_eval_file, delim_whitespace=True, encoding='utf-8', header=None, \
+                          names = ['TOPIC_NO','Q0','ID','RANK','SCORE','RUN_NAME']))
