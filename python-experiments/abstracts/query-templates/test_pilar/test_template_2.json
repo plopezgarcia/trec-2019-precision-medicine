@@ -1,0 +1,44 @@
+{
+	"from":0, "size": {{output_size}},
+	"query": {
+		"bool": {
+			"must": [
+				{
+					"multi_match": {
+						"query": "{{disease}}",
+						"fields": [
+							"title",
+							"abstract"
+						],
+						"tie_breaker": 0.5,
+						"type": "best_fields",
+						"boost": 1.5
+					}
+				},
+				{
+					"multi_match": {
+						"query": "{{gene}}",
+						"fields": [
+							"title",
+							"abstract"
+						],
+						"tie_breaker": 0.5,
+						"type": "cross_fields",
+						"boost": 1					
+					}
+				}
+			],
+			"should": [
+				{
+					"multi_match": {
+						"query": "surgery therapy treatment prognosis prognostic survival patient resistance recurrence targets malignancy study therapeutical outcome",
+						"fields": [
+							"title",
+							"abstract"
+						]
+					}
+				}
+			]
+		}
+	}
+}

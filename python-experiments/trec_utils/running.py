@@ -50,12 +50,77 @@ def run(topics_df, abstracts_or_trials, run_params):
         # Fill template with query
         with open('./query-templates/' + run_params['query_template'], 'r') as template_file:
             query = template_file.read()
-            query = replace_topic_dimensions(query, topic_row, ['disease', 'gene', 'gene1', 'gene2', \
+            query = replace_topic_dimensions(query, topic_row, ['disease', 'gene', 'gene1', \
                                                                 'sex', 'age', 'age_group'])
             query = replace_run_parameters(query, run_params,
-                                            ['disease_tie_breaker','disease_multi_match_type', 'disease_boost', \
-                                            'gene_tie_breaker', 'gene_multi_match_type', 'gene_boost'])
-        #print(query)
+                                            [ 'output_size', \
+                                             'disease_tie_breaker','disease_multi_match_type', 'disease_boost', \
+                                             'gene_tie_breaker', 'gene_multi_match_type', 'gene_boost', \
+                                             'gene1_tie_breaker', 'gene1_multi_match_type', 'gene1_boost'])
+            
+           
+            
+            # campo gene2
+            if len(topic_row['gene2']) > 0 and 'gene2_tie_breaker' in run_params:
+                #print(index, "Tenemos que añadir el Gene2")
+                dic_query = json.loads(query)
+                
+                new_must = { "multi_match": { "query": topic_row['gene2'],
+                                             "fields": [
+                                                 "title^2",
+                                                 "abstract",
+                                                 "meshTags"
+                                             ],
+                                             "tie_breaker": run_params['gene2_tie_breaker'],
+                                             "type": run_params['gene2_multi_match_type'],
+                                             "boost": run_params['gene2_boost']
+                                            }
+                           }
+                
+                dic_query['query']['bool']['must'].append(new_must)
+                query = json.dumps(dic_query)
+                
+            
+            # campo gene3
+            if len(topic_row['gene3']) > 0  and 'gene3_tie_breaker' in run_params:
+                #print(index, "Tenemos que añadir el Gene3")
+                dic_query = json.loads(query)
+                
+                new_must = { "multi_match": { "query": topic_row['gene3'],
+                                             "fields": [
+                                                 "title^2",
+                                                 "abstract",
+                                                 "meshTags"
+                                             ],
+                                             "tie_breaker": run_params['gene3_tie_breaker'],
+                                             "type": run_params['gene3_multi_match_type'],
+                                             "boost": run_params['gene3_boost']
+                                            }
+                           }
+                
+                dic_query['query']['bool']['must'].append(new_must)
+                query = json.dumps(dic_query)
+            
+            # campo extra_info
+            if len(topic_row['extra_inf']) > 0 and 'extrainf_tie_breaker' in run_params:
+                #print(index, "Tenemos que añadir el extra_info")
+                dic_query = json.loads(query)
+                
+                new_must = { "multi_match": { "query": topic_row['extra_inf'],
+                                             "fields": [
+                                                 "title",
+                                                 "abstract^2"
+                                             ],
+                                             "tie_breaker": run_params['extrainf_tie_breaker'],
+                                             "type": run_params['extrainf_multi_match_type'],
+                                             "boost": run_params['extrainf_boost']
+                                            }
+                           }
+                dic_query['query']['bool']['should'].append(new_must)
+                query = json.dumps(dic_query)
+                
+        #print(index, query)
+        
         if abstracts_or_trials == 'ABSTRACTS':
             response = requests.post(URL_ABSTRACTS, data=query, headers=HEADERS)
         if abstracts_or_trials == 'TRIALS':

@@ -1,0 +1,50 @@
+{
+	"from":0, "size": {{output_size}},
+	"query": {
+		"bool": {
+			"must": [
+				{
+					"multi_match": {
+						"query": "{{disease}}",
+						"fields": [
+							"title^2",
+							"abstract",
+							"meshTags"
+						]
+				},
+				{
+					"multi_match": {
+						"query": "{{gene}}",
+						"fields": [
+							"title^2",
+							"abstract",
+							"meshTags"
+						]
+					}
+				}
+			],
+			"should": [
+				{
+					"multi_match": {
+						"query": "{{sex}}",
+						"fields": [
+							"title",
+							"abstract",
+							"meshTags"
+						]
+					}
+				},
+				{
+					"multi_match": {
+						"query": "{{age_group}}",
+						"fields": [
+							"title",
+							"abstract",
+							"meshTags"
+						]
+					}
+				}
+			]
+		}
+	}
+}

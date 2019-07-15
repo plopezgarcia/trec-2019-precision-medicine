@@ -1,0 +1,75 @@
+{
+	"from":0, "size":1000,
+	"query": {
+		"bool": {
+			"must": [
+				{
+					"multi_match": {
+						"query": "{{disease}}",
+						"fields": [
+							"title",
+							"abstract",
+							"meshTags"
+						],
+						"tie_breaker": {{disease_tie_breaker}},
+						"type": "{{disease_multi_match_type}}",
+						"boost": {{disease_boost}}
+					}
+				},
+				{
+					"multi_match": {
+						"query": "{{gene1}}",
+						"fields": [
+							"title",
+							"abstract",
+							"meshTags"
+						],
+						"tie_breaker": {{gene1_tie_breaker}},
+						"type": "{{gene1_multi_match_type}}",
+						"boost": {{gene1_boost}}
+					}
+				}
+			],
+			"should": [
+				{
+					"multi_match": {
+						"query": "surgery therapy treatment prognosis prognostic survival patient resistance recurrence targets malignancy study therapeutical outcome",
+						"fields": [
+							"title",
+							"abstract"
+						],
+						"tie_breaker": 0.3,
+						"type": "best_fields",
+						"boost": 1.5
+					}
+				},
+				{
+					"multi_match": {
+						"query": "{{sex}}",
+						"fields": [
+							"title",
+							"abstract",
+							"meshTags"
+						],
+						"tie_breaker": 0.3,
+						"type": "best_fields",
+						"boost": 1.5
+					}
+				},
+				{
+					"multi_match": {
+						"query": "{{age_group}}",
+						"fields": [
+							"title",
+							"abstract",
+							"meshTags"
+						],
+						"tie_breaker": 0.3,
+						"type": "best_fields",
+						"boost": 1.5
+					}
+				}
+			]
+		}
+	}
+}
