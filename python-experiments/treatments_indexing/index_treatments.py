@@ -60,7 +60,7 @@ def index_file(file):
                     doc = {'pubmedId':pubmedId,'treatments':{treatment:1}, 'cuis':{cui:1}}
             except:
                 print("Exception, line blank?")
-                doc = fake_doc
+                continue
     
     helpers.bulk(es, actions)
     print(file + " indexed!")
