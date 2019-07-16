@@ -65,14 +65,15 @@ def index_file(file):
     helpers.bulk(es, actions)
     print(file + " indexed!")
     
-
+# Download and extract this file here
+# http://www.trec-cds.org/medline_treatments.tar.gz
 def index_all_files():
     i = 0
     for file in os.listdir(nb_dir + "/treatments_indexing/medline_treatments"):
         if file.endswith(".txt"):
             file = nb_dir + "/treatments_indexing/medline_treatments/" + file
             index_file(file)
-            i = 1 + 1
+            i = i + 1
     print("Finished! - Files:", i)
     
 if __name__ == "__main__":
