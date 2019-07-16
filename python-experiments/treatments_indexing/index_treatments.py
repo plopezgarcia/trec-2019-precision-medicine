@@ -8,6 +8,7 @@ from trec_utils import utils
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
+# Remember that a config.json has to be present in trec_utils
 config = utils.load_config()
 url_info = urlparse(config['ELASTIC'])
 
@@ -46,10 +47,6 @@ def index_file(file):
                         'treatments': [ [k,str(v)] for k, v in doc['treatments'].items() ],
                         'cuis': [ [k,str(v)] for k, v in doc['cuis'].items() ]
                       }
-                    #print(doc)
-                    #print(doc) # INDEX DOC
-                    #res = es.index(index="treatments", doc_type='treatments', id=int(pubmedId), body=doc)
-                    #print(int(pubmedId))
                     actions.append({
                         "_id": doc_to_save['pubmedId'],
                         "_op_type": "index",
