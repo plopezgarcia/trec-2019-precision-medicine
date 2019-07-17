@@ -5,6 +5,7 @@ import re
 import pandas
 import pytrec_eval
 from sklearn.model_selection import train_test_split
+import requests
 
 
 def load_config():
@@ -154,6 +155,33 @@ def split_qrels(qrels, topics_train, topics_test, topics_dev):
            qrels_of_topics(qrels, topics_test),
            qrels_of_topics(qrels, topics_dev))
 
+def run_with_treatments(run): #Slow as hell. Needs improvement
+	config = load_config()
+	treatments_tuples_list = []
+
+	# iterate over rows with iterrows()
+	for index, row in run.iterrows():
+	    _id = row['ID']
+	    URL_ABSTRACTS = config['ELASTIC'] + '/treatments/treatments/'+ _id
+	    URL_TRIALS = config['ELASTIC'] + '/treatments/treatments' + _id
+
+	    treatments = requests.get(URL_ABSTRACTS).json()
+	    treatments1 = ''
+	    treatments2 = ''
+	    treatments3 = ''
+	    if treatments['found']:
+	        treatments1 = sorted(treatments["_source"]["treatments"], key=lambda x: x[1], reverse=True)[0][0]
+	        if len(treatments["_source"]["treatments"]) > 1:
+	            treatments2 = sorted(treatments["_source"]["treatments"], key=lambda x: x[1], reverse=True)[1][0]
+	        if len(treatments["_source"]["treatments"]) > 2:
+	            treatments3 = sorted(treatments["_source"]["treatments"], key=lambda x: x[1], reverse=True)[2][0]
+	    
+	    row_tuple = _id, treatments1, treatments2, treatments3
+	    treatments_tuples_list.append(row_tuple)
+	    
+	treatments_merged_columns = pandas.DataFrame(columns=['ID', 'TREATMENT_1', 'TREATMENT_2', 'TREATMENT_3'], data=treatments_tuples_list)
+	results = pandas.merge(run, treatments_merged_columns, on='ID')
+	return(results)
 
 def to_trec_run_file(run_df, run_params):
     run_df[['TOPIC_NO', 'Q0', 'ID', 'RANK', 'SCORE', 'RUN_NAME']].to_csv('submitted_runs/'+run_params['run_id'],
