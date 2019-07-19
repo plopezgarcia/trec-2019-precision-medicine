@@ -155,7 +155,7 @@ def split_qrels(qrels, topics_train, topics_test, topics_dev):
            qrels_of_topics(qrels, topics_dev))
 
 def run_with_treatments(run): #Slow as hell. Needs improvement
-	
+
     config = load_config()
     run['TREATMENTS_1'], run['TREATMENTS_2'], run['TREATMENTS_3'] = '', '', ''
 
