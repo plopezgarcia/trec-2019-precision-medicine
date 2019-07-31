@@ -6,6 +6,9 @@ import pandas
 import pytrec_eval
 from sklearn.model_selection import train_test_split
 import requests
+import time
+import csv
+from urllib3.exceptions import NewConnectionError
 
 def load_config():
     with open(os.path.dirname(__file__) + '/config.json', 'r') as f:
@@ -155,16 +158,26 @@ def split_qrels(qrels, topics_train, topics_test, topics_dev):
            qrels_of_topics(qrels, topics_dev))
 
 def run_with_treatments(run): #Slow as hell. Needs improvement
-
+    
     config = load_config()
     run['TREATMENTS_1'], run['TREATMENTS_2'], run['TREATMENTS_3'] = '', '', ''
-
+    
+    print("START", time.ctime())
+    
     # iterate over rows with iterrows()
     for index, row in run.iterrows():
         _id = row['ID']
+        
         URL_TREATMENTS = config['ELASTIC'] + '/treatments/treatments/'+ _id
-
-        treatments = requests.get(URL_TREATMENTS).json()
+    
+        try:
+            treatments = requests.get(URL_TREATMENTS).json()
+        
+        except NewConnectionError as nce:
+            treatments = {}
+            
+            print("Exception NewConnectionError")
+            
         if treatments['found']:
             treatments_sorted = sorted(treatments["_source"]["treatments"], key=lambda x: x[1], reverse=True) 
             if len(treatments["_source"]["treatments"]) >= 3:
@@ -173,10 +186,54 @@ def run_with_treatments(run): #Slow as hell. Needs improvement
                 run['TREATMENTS_1'][index], run['TREATMENTS_2'][index] = treatments_sorted[0][0], treatments_sorted[1][0]
             else :
                 run['TREATMENTS_1'][index] = treatments_sorted[0][0]
-
+                
+    print("FINISH", time.ctime())
     return(run)
+
 
 def to_trec_run_file(run_df, run_params):
     run_df[['TOPIC_NO', 'Q0', 'ID', 'RANK', 'SCORE', 'RUN_NAME']].to_csv('submitted_runs/'+run_params['run_id'],
                                                                          sep=' ', encoding='utf-8',
                                                                          header=False, index=False)
+'''
+No funciona con comillas dobles
+def to_trec_run_file_with_treatments(run_df, run_params):
+    run_df[['TOPIC_NO', 'Q0', 'ID', 'RANK', 'SCORE', 'RUN_NAME', '"TREATMENTS_1"' , '"TREATMENTS_2"', '"TREATMENTS_3"']].to_csv('submitted_runs/'+run_params['run_id'],sep=' ', quoting=csv.QUOTE_NONE, quotechar="",  escapechar="\\",  encoding='utf-8', header=False, index=False)
+'''
+
+def to_trec_run_file_with_treatments(df_run, run_params):
+    
+    # Get row of indexes for which column TREATMENTS_1 has value ""
+    row_delete = df_run[ df_run['TREATMENTS_1'] == "" ].index
+
+    # Delete these row indexes from dataFrame
+    run_deleted = df_run.drop(row_delete , inplace=False)
+    
+    file_out = open('submitted_runs/'+run_params['run_id'], "w")
+    df_sort = df_run.sort_values(by=['TOPIC_NO'])
+    
+    dic_count_topics = {}
+    
+    # iterate over rows with iterrows()
+    for index, row in run_deleted.iterrows():
+        
+        dic_count_topics[row['TOPIC_NO']] = dic_count_topics.get(row['TOPIC_NO'], 0) + 1
+        
+        if dic_count_topics[row['TOPIC_NO']] < 1000:
+            
+            out_line = str(row['TOPIC_NO'])+' '+str(row['Q0'])+' '+str(row['ID'])+' '
+            out_line += str(dic_count_topics[row['TOPIC_NO']])+ ' '+str(row['SCORE'])+' '+str(row['RUN_NAME'])
+            
+            if len(row['TREATMENTS_1']) > 0 :
+                out_line += ' "' + str(row['TREATMENTS_1'])+'"'
+                
+            if len(row['TREATMENTS_2']) > 0 :
+                out_line += ' "' + str(row['TREATMENTS_2'])+'"'
+                
+            if len(row['TREATMENTS_3']) > 0 :
+                out_line += ' "' + str(row['TREATMENTS_3'])+'"'
+            
+
+            file_out.write(out_line + '\n')
+    
+    file_out.close()
