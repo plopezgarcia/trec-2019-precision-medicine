@@ -1,9 +1,8 @@
 {
-	"from":0, "size":1000,
+	"from":0, "size":{{output_size}},
 	"query": {
 		"bool": {
 			"must": [
-				{ "exists": { "field": "abstract" }},
 				{
 					"multi_match": {
 						"query": "{{disease}}",

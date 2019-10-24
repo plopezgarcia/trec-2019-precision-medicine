@@ -1,5 +1,5 @@
 {
-	"from":0, "size":1000,
+	"from":0, "size": {{output_size}},
 	"query": {
 		"bool": {
 			"must": [
@@ -8,8 +8,7 @@
 						"query": "{{disease}}",
 						"fields": [
 							"title",
-							"abstract",
-							"meshTags"
+							"abstract"
 						],
 						"tie_breaker": 0.5,
 						"type": "best_fields",
@@ -21,20 +20,25 @@
 						"query": "{{gene}}",
 						"fields": [
 							"title",
-							"abstract",
-							"meshTags"
+							"abstract"
 						],
 						"tie_breaker": 0.5,
-						"type": "best_fields"
+						"type": "cross_fields",
+						"boost": 1					
 					}
 				}
 			],
 			"should": [
-				{"term": {"meshTags" : "humans"}},
-				{"term": {"meshTags" : "female"}},
-				{"term": {"meshTags" : "aged"}}
+				{
+					"multi_match": {
+						"query": "surgery therapy treatment prognosis prognostic survival patient resistance recurrence targets malignancy study therapeutical outcome",
+						"fields": [
+							"title",
+							"abstract"
+						]
+					}
+				}
 			]
-			}
 		}
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"from":0, "size":1000,
+	"from":0, "size": {{output_size}},
 	"query": {
 		"bool": {
 			"must": [
@@ -8,11 +8,10 @@
 						"query": "{{disease}}",
 						"fields": [
 							"title",
-							"abstract",
-							"meshTags"
+							"abstract"
 						],
 						"tie_breaker": 0.5,
-						"type": "most_fields",
+						"type": "best_fields",
 						"boost": 1.5
 					}
 				},
@@ -21,11 +20,10 @@
 						"query": "{{gene}}",
 						"fields": [
 							"title",
-							"abstract",
-							"meshTags"
+							"abstract"
 						],
 						"tie_breaker": 0.5,
-						"type": "most_fields",
+						"type": "best_fields",
 						"boost": 1
 					}
 				}
